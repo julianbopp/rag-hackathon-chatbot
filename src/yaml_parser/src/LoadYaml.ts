@@ -15,6 +15,7 @@ import { AzureOpenAiEmbeddings } from '../../embeddings/azure-embeddings.js';
 import { BedrockEmbedding } from '../../embeddings/bedrock-embeddings.js';
 import { FireworksEmbedding } from '../../embeddings/fireworks-embeddings.js';
 import { AzureChatAI } from '../../models/azureopenai-model.js';
+import { AdaEmbeddings } from '../../embeddings/ada-embeddings.js';
 
 // src/loaders/confluence-loader.ts src/loaders/docx-loader.ts src/loaders/excel-loader.ts src/loaders/json-loader.ts src/loaders/pdf-loader.ts src/loaders/ppt-loader.ts src/loaders/sitemap-loader.ts src/loaders/text-loader.ts src/loaders/web-loader.ts src/loaders/youtube-channel-loader.ts src/loaders/youtube-loader.ts src/loaders/youtube-search-loader.ts
 function getDataFromYamlFile() {
@@ -75,8 +76,8 @@ export function getDatabaseConfigInfo() {
 export function getModelClass() {
   const parsedData = getDataFromYamlFile();
   const params = {};
-  if(parsedData.llms.temperature) params["temperature"] = parsedData.llms.temperature;
-  if(parsedData.llms.maxTokens) params["maxTokens"] = parsedData.llms.max_tokens;
+  if (parsedData.llms.temperature) params["temperature"] = parsedData.llms.temperature;
+  if (parsedData.llms.maxTokens) params["maxTokens"] = parsedData.llms.max_tokens;
   switch (parsedData.llms.class_name) {
     case 'VertexAI':
       assert(typeof parsedData.llms.model_name === 'string', 'model_name of VertexAI is required');
@@ -106,8 +107,8 @@ export function getModelClass() {
       return new AzureChatAI(params);
     default:
       throw new Error('Unsupported model class name');
-      // // Handle unsupported class name (optional)
-      // return new Anthropic({ modelName: parsedData.llms.model_name }); // Or throw an error
+    // // Handle unsupported class name (optional)
+    // return new Anthropic({ modelName: parsedData.llms.model_name }); // Or throw an error
   }
 }
 
@@ -119,7 +120,7 @@ export function getEmbeddingModel() {
   const parsedData = getDataFromYamlFile();
   switch (parsedData.embedding.class_name) {
     case 'VertexAI':
-      return new GeckoEmbedding({modelName: parsedData.embedding.model_name});
+      return new GeckoEmbedding({ modelName: parsedData.embedding.model_name });
     case 'Azure-OpenAI-Embeddings':
       return new AzureOpenAiEmbeddings({
         modelName: parsedData.embedding.model_name,
@@ -127,14 +128,16 @@ export function getEmbeddingModel() {
         apiVersion: parsedData.embedding.api_version,
         azureOpenAIApiInstanceName: parsedData.embedding.azure_openai_api_instance_name
       });
+    case 'AdaEmbeddings':
+      return new AdaEmbeddings();
     case 'Cohere':
       return new CohereEmbeddings({ modelName: parsedData.embedding.model_name });
     case 'Titan':
       return new TitanEmbeddings();
     case 'Bedrock':
-      return new BedrockEmbedding({ modelName: parsedData.embedding.model_name, dimension: parsedData.embedding.dimension});
+      return new BedrockEmbedding({ modelName: parsedData.embedding.model_name, dimension: parsedData.embedding.dimension });
     case 'Fireworks':
-      return new FireworksEmbedding({ modelName: parsedData.embedding.model_name, dimension: parsedData.embedding.dimension});  
+      return new FireworksEmbedding({ modelName: parsedData.embedding.model_name, dimension: parsedData.embedding.dimension });
     case 'Nomic-v1':
       return new NomicEmbeddingsv1();
     case 'Nomic-v1.5':
@@ -199,33 +202,33 @@ export function getIngestLoader() {
           chunkOverlap: data.chunk_overlap,
         }));
         break;
-        case 'youtube':
-          dataloaders.push(new YoutubeLoader({
-            videoIdOrUrl: data.video_id_or_url,
-            chunkSize: data.chunk_size,
-            chunkOverlap: data.chunk_overlap,
-          }));
+      case 'youtube':
+        dataloaders.push(new YoutubeLoader({
+          videoIdOrUrl: data.video_id_or_url,
+          chunkSize: data.chunk_size,
+          chunkOverlap: data.chunk_overlap,
+        }));
         break;
-        case 'youtube-channel':
-          dataloaders.push(new YoutubeChannelLoader({
-            channelId: data.channel_id,
-            chunkSize: data.chunk_size,
-            chunkOverlap: data.chunk_overlap,
-          }));
+      case 'youtube-channel':
+        dataloaders.push(new YoutubeChannelLoader({
+          channelId: data.channel_id,
+          chunkSize: data.chunk_size,
+          chunkOverlap: data.chunk_overlap,
+        }));
         break;
-        case 'ppt':
-          dataloaders.push(new PptLoader({
-            filePath: data.source_path,
-            chunkSize: data.chunk_size,
-            chunkOverlap: data.chunk_overlap,
-          }));
+      case 'ppt':
+        dataloaders.push(new PptLoader({
+          filePath: data.source_path,
+          chunkSize: data.chunk_size,
+          chunkOverlap: data.chunk_overlap,
+        }));
         break;
-        case 'ppt':
-          dataloaders.push(new PptLoader({
-            filePath: data.source_path,
-            chunkSize: data.chunk_size,
-            chunkOverlap: data.chunk_overlap,
-          }));
+      case 'ppt':
+        dataloaders.push(new PptLoader({
+          filePath: data.source_path,
+          chunkSize: data.chunk_size,
+          chunkOverlap: data.chunk_overlap,
+        }));
         break;
       default:
       // Handle unsupported source type (optional)
