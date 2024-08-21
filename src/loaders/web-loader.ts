@@ -12,8 +12,8 @@ export class WebLoader extends BaseLoader<{ type: 'WebLoader' }> {
     private readonly contentOrUrl: string;
     private readonly isUrl: boolean;
 
-    constructor({}: { url: string; chunkSize?: number; chunkOverlap?: number });
-    constructor({}: { content: string; chunkSize?: number; chunkOverlap?: number });
+    constructor({ }: { url: string; chunkSize?: number; chunkOverlap?: number });
+    constructor({ }: { content: string; chunkSize?: number; chunkOverlap?: number });
     constructor({
         content,
         url,
@@ -43,6 +43,11 @@ export class WebLoader extends BaseLoader<{ type: 'WebLoader' }> {
                 : this.contentOrUrl;
 
             const text = convert(data, {
+                baseElements: {
+                    selectors: [
+                        'article#rsArticle'
+                    ]
+                },
                 wordwrap: false,
                 preserveNewlines: false,
             }).replace(/(?:https?|ftp):\/\/[\n\S]+/g, '');
